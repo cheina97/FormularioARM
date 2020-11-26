@@ -7,8 +7,7 @@
 - C: ALU operation Carried out
 - V: ALU operation oVerflowed
 - GE: Greater Than or Equal flag
-
-![](./img/image-20201126114735053.png)
+  <img src="./img/image-20201126114735053.png"  />
 
 
 
@@ -71,7 +70,6 @@ In the example r5,r4 = r1,r0 - r3,r2
 
 - RSB <Rd>,<Rn>,<op2>
   Rd = op2 - Rn + C – 1
-  
 
 ### Multiplication
 
@@ -104,7 +102,6 @@ In the example r5,r4 = r1,r0 - r3,r2
 **If Rn is not exactly divisible by Rm, the result is rounded toward zero.**
 
 UDIV and SDIV **do not change the flags** (the suffix ‘S’ can not be added).
-
 
 ### Logic Instructions
 
@@ -184,6 +181,8 @@ expr is a *numeric expression in the proper range* or *a string* (**with DCB onl
   
 
 ### Align
+
+asdad
 
 
 
