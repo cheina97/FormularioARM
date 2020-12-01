@@ -121,7 +121,6 @@ UDIV and SDIV **do not change the flags** (the suffix ‘S’ can not be added).
   ![image-20201126110051855](./img/image-20201126110051855.png)
 -  ISTRUZIONE CHE NON CAPiSCO DALLE SLIDES
   ![image-20201126110143749](./img/image-20201126110143749.png)
-  
 
 ### Rotate instructions
 
@@ -144,7 +143,7 @@ If sectionName starts with a number, it must be enclosed in bars e.g. |1_DataAre
 
 Example: AREA Example,CODE,READONLY
 
-##### Section attributes
+#### Section attributes
 
 - CODE: the section contains machine code
 - DATA: the section contains data
@@ -289,6 +288,8 @@ Similar to V[i+1] in C, if ! is present it is V[++1]
 
 Similar ti V[i++] in C
 
+
+
 ## Branch
 
 - B \<label>
@@ -323,3 +324,107 @@ Similar ti V[i++] in C
 **Only forward branch is possible (4-130 byte)**
 
 **Rn must be among r0-r7**
+
+
+
+## STACK
+
+### LDM and STM
+
+- LDM{xx}/STM{xx} \<Rn>{!}, \<regList>
+
+xx specifies the addressing mode, i.e., how and when Rn is updated
+
+With ! , Rn is set to the updated value
+
+#### List of registers
+
+Example: {r0-r4, r10, LR} indicates r0, r1, r2, r3, r4, r10,
+r14.
+
+PC can appear only with LDM and only if LR is missing in the list.
+
+Example: {r8, r1, r3-r5, r14} indicates r1, r3, r4, r5, r8,
+r14.
+
+#### Addressing modes
+
+- IA: increment after (default)
+- DB: decrement before
+
+| Stack type      | PUSH                     | POP                       |
+| --------------- | ------------------------ | ------------------------- |
+| Full descending | STMDB<br/>STMFD          | LDM<br />LDMIA<br />LDMFD |
+| Empty Ascending | STM<br/>STMIA<br />STMEA | LDMDB<br />LDMEA          |
+
+### PUSH and POP
+
+- • PUSH \<regList> 
+  is the same as STMDB SP!, \<regList>
+- • POP \<regList> 
+  is the same as LDMIA SP!, \<regList>
+
+### Subroutine
+
+- BL \<label> and BLX \<Rn>
+- write the address of the next instruction to LR
+- write the value of label or Rn to PC
+
+### Nested calls to subroutines
+
+- PUSH {regList, LR}
+- POP {regList, PC}
+
+Where regList is the list of registers used in the previous routine
+
+
+
+## Supervisor call (SVC)
+
+### SVC instruction
+
+```assembly
+SVC_Handler	PROC
+			EXPORT 	SVC_Handler	[WEAK]
+			B		.
+			ENDP
+```
+
+- {lable} SVC immediate
+
+#### Get the immediate
+
+```assembly
+SVC_Handler
+			LDR R0,[SP,#24]
+			LDR	R1,[R0,#-4]
+			BIC R1,0xFF000000
+			LSR R1,#16
+			...
+			BX LR ;return and restore registers from the previous state
+END
+```
+
+### CONTROL register
+
+- **CONTROL[2]**
+  • =0 FPU not active
+  • =1 FPU active
+- **CONTROL[1]**
+  • =0 In handler mode - **MSP** is selected. No alternate stack possible for handler mode.
+  • =0 In thread mode - Default stack pointer **MSP** is used.
+  • =1 In thread mode - Alternate stack pointer **PSP** is used.
+- **CONTROL[0]** 
+  • =0 In thread mode and **privileged** state.
+  • =1 In thread mode and **user** state
+
+After **RESET** program is in **privileged** state and use **MSP** as **SP**
+
+#### Setup User + PSP
+
+```assembly
+MOV		R0, #3
+MSR		CONTROL, R0
+LDR 	SP, =Stack_Process
+```
+
